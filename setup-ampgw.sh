@@ -2,10 +2,10 @@
 
 . ./env.sh
 
-echo ================================
-echo === Bootstraping images      ===
-echo ================================
-docker pull axway.jfrog.io/ampc-docker-release-ptx/ampgw-install-axway-cli:0.6.0  
+#echo ================================
+#echo === Bootstraping images      ===
+#echo ================================
+#docker pull axway.jfrog.io/ampc-docker-release-ptx/ampgw-install-axway-cli:0.6.0  
 
 echo ================================
 echo === Creating Service Account ===
@@ -34,6 +34,11 @@ kubectl create secret generic ampgw-secret \
     --from-file listenerCertificate=listener_certificate.pem \
     --from-literal orgId=$ORG_ID \
     --from-literal clientId=$CLIENT_ID
+
+echo ================================
+echo === Deleting Environment    ===
+echo ================================
+axway --env $PLATFORM_ENV central delete env $ENVIRONMENT -y
 
 echo ============================
 echo === Installing Dataplane ===
@@ -88,6 +93,5 @@ helm install ampgw ampc-rel/ampgw -f override.yaml --wait
 echo ============================
 echo === Waiting for all Pods ===
 echo ============================
-echo Turn off your VPN
 kubectl wait --timeout 10m --for=condition=Complete jobs --all
 

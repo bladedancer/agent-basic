@@ -2,11 +2,11 @@
 
 . ./env.sh
 
-axway central delete deployment webhooksite -s $ENVIRONMENT -y
-axway central delete virtualapi webhooksite -y
+axway --env $PLATFORM_ENV central delete deployment webhooksite -s $ENVIRONMENT -y
+axway --env $PLATFORM_ENV central delete virtualapi webhooksite -y
 
-axway central apply -f vapi/vapi.yaml
-axway central apply -f vapi/releasetag.yaml
+axway --env $PLATFORM_ENV central apply -f vapi/vapi.yaml
+axway --env $PLATFORM_ENV central apply -f vapi/releasetag.yaml
 sleep 20
 
 cat << EOF > vapi/deployment.yaml
@@ -25,7 +25,7 @@ spec:
   virtualHost: "$ENVIRONMENT.ampgw.sandbox.axwaytest.net"
 EOF
 
-axway central apply -f vapi/deployment.yaml
+axway --env $PLATFORM_ENV central apply -f vapi/deployment.yaml
 
 echo =========
 echo = Test  =

@@ -1,0 +1,31 @@
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.name }}
+  labels:
+{{ include "proxy.labels" . | indent 4 }}
+  annotations:
+{{- with .Values.service.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if ne .Values.service.loadBalancerIP "" }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    {{- if .Values.global.exposeProxyAdminPort }}
+    - name: admin
+      port: {{ .Values.global.proxyAdminPort }}
+      targetPort: admin
+      protocol: TCP
+    {{- end }}
+  {{- range $key, $value := .Values.service.portsTemplate }}
+    - name: {{ $key }}
+{{ tpl $value $ | nindent 6 }}
+  {{- end }}
+
+  selector:
+    {{- include "proxy.selectorLabels" . | nindent 4 }}
+{{- end }}

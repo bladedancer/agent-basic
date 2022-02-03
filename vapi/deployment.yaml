@@ -1,5 +1,18 @@
 apiVersion: v1alpha1
 group: management
+kind: VirtualHost
+name: gmdemo
+metadata:
+  scope:
+    kind: Environment
+    name: gmdemo
+tags:
+  - v1
+spec:
+  domain: "gmdemo.ampgw.sandbox.axwaytest.net"
+---
+apiVersion: v1alpha1
+group: management
 kind: Deployment
 name: webhooksite
 metadata:
@@ -10,4 +23,4 @@ tags:
   - v1
 spec:
   virtualAPIRelease: webhooksite-1.0.0
-  virtualHost: "gmdemo.ampgw.sandbox.axwaytest.net"
+  virtualHost: gmdemo

@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "governance-agent.fullname" . }}
+  labels:
+    {{- include "governance-agent.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "governance-agent.selectorLabels" . | nindent 6 }}
+  serviceName: {{ .Values.service.name }}
+  replicas: {{ .Values.global.agentReplicas }}
+  template:
+    metadata:
+      labels:
+        {{- include "governance-agent.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        ## Custom pod labels
+        {{- range $key, $value := .Values.podLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+      annotations:
+        checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.podAnnotations }}
+        ## Custom pod annotations
+        {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ include "governance-agent.serviceAccountName" . }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: "{{ .Values.priorityClassName }}"
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if .Values.initContainersTemplate }}
+      initContainers:
+        {{ tpl .Values.initContainersTemplate $ | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            {{ toYaml .Values.command | nindent 12 }}
+          args:
+            {{- if $.Values.argsTemplate }}
+            {{ tpl $.Values.argsTemplate $ | nindent 12}}
+            {{- else }}
+            {{ toYaml .Values.args | nindent 12 }}
+            {{- end }}
+          {{- with .Values.ports }}
+          ports:
+            {{- range $key, $port := . }}
+            - name: {{ $key }}
+              {{ toYaml $port | nindent 14 }}
+            {{- end }}
+          {{- end }}
+          livenessProbe:
+            {{ toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{ toYaml .Values.readinessProbe | nindent 12 }}
+          startupProbe:
+            {{ toYaml .Values.startupProbe | nindent 12 }}
+          env:
+          {{- range $var, $value := .Values.env }}
+            - name: {{ $var | upper | replace "." "_" }}
+              value: {{ tpl $value $ | quote}}
+          {{- end }}
+          {{- range $var, $value := .Values.envField }}
+            - name: {{ $var | upper | replace "." "_" }}
+              valueFrom:
+                fieldRef: 
+                  {{ toYaml $value | nindent 18 }}
+          {{- end }}
+          {{- range $var, $value := .Values.envSecret }}
+            - name: {{ $var | upper | replace "." "_" }}
+              valueFrom:
+                secretKeyRef: 
+                  {{ toYaml $value | nindent 18 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          lifecycle:
+            {{ toYaml .Values.lifecycle | nindent 12 }}
+          {{- if or .Values.volumes .Values.secretMounts }}
+          volumeMounts:
+            {{- if .Values.volumeMounts }}
+            {{ toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+            {{- range $key, $value := .Values.secretMounts }}
+            - name: {{ $key }}
+              mountPath: {{ $value.mountPath }}
+            {{- end }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.volumes .Values.secretMounts }}
+      volumes:
+        {{- if .Values.volumes }}
+        {{ toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        {{- range $key, $value := .Values.secretMounts }}
+        - name: {{ $key }}
+          secret:
+            secretName: {{ $value.secretName }}
+            defaultMode: {{ $value.defaultMode }}
+        {{- end }}
+      {{- end }}

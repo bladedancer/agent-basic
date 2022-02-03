@@ -14,6 +14,19 @@ sleep 20
 cat << EOF > vapi/deployment.yaml
 apiVersion: v1alpha1
 group: management
+kind: VirtualHost
+name: $ENVIRONMENT
+metadata:
+  scope:
+    kind: Environment
+    name: $ENVIRONMENT
+tags:
+  - v1
+spec:
+  domain: "$ENVIRONMENT.ampgw.sandbox.axwaytest.net"
+---
+apiVersion: v1alpha1
+group: management
 kind: Deployment
 name: webhooksite
 metadata:
@@ -24,7 +37,7 @@ tags:
   - v1
 spec:
   virtualAPIRelease: webhooksite-1.0.0
-  virtualHost: "$ENVIRONMENT.ampgw.sandbox.axwaytest.net"
+  virtualHost: $ENVIRONMENT
 EOF
 
 axway --env $PLATFORM_ENV central apply -f vapi/deployment.yaml

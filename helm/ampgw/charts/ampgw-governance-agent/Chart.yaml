@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 0.7.0
+description: Amplify Gateway Governance Agent Helm Chart.
+name: ampgw-governance-agent
+type: application
+version: 0.7.0

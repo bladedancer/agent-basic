@@ -1,0 +1,138 @@
+####################################################################
+# Global values
+# These values can be overridden
+####################################################################
+global:
+  # Override this if a different Environment name is required
+  environment: gmdemo
+  environmentTitle: Demo AmpGw
+  # Override this if a different listener port for API traffic is required
+  listenerPort: 4443
+  # Override this if a different name is required for the Governance Agent
+  agentReplicas: 3
+  agentName: ampgw-governance-agent
+  agentTitle: Amplify Governance Agent
+  ampConfigTitle: Config for Amplify Gateway data plane
+  # The proxy admin port is not externally accessible by default, override this to
+  # true in order to invoke the proxy admin APIs
+  exposeProxyAdminPort: false
+  # Override this if exposeProxyAdminPort=true and a different port is required for the proxy admin APIs.
+  proxyAdminPort: 9901
+  # Rate limiting for ADS from agent
+  adsMaxTokens: 10
+  adsFillRate: 4
+
+####################################################################
+# Values for the provisioning Job
+####################################################################
+image:
+  repository: axway.jfrog.io/ampc-docker-release-ptx/ampgw-install-axway-cli
+  tag: 0.7.0
+  pullPolicy: Always
+
+imagePullSecrets: []
+
+# Only override if not using Amplify Central production environment
+provisioning:
+  platformEnv: prod
+  centralUrl: https://apicentral.axway.com
+
+# Service account used by provisioning job to authenticate via the Axway CLI
+secretMounts:
+  auth:
+    secretName: ampgw-secret
+    mountPath: /keys
+    defaultMode: 420  # 420 in base10 == 0644 in octal
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  allowPrivilegeEscalation: false
+  # Cannot have readOnlyRootFilesystem:true as need to write tmp files
+  #readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 2500
+
+# These may need tuning
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# The Amplify Central resources created or updated by the provisioning job
+templates:
+  central-env-resources-1.yaml: |-
+    group: management
+    apiVersion: v1alpha1
+    kind: Environment
+    name: {{ .Values.global.environment }}
+    title: {{ .Values.global.environmentTitle}}
+    spec:
+      description: Amplify Gateway dataplane.
+    ---
+    group: management
+    apiVersion: v1alpha1
+    kind: Secret
+    name: ampgw-tls
+    metadata:
+      scope:
+        kind: Environment
+        name: {{ .Values.global.environment }}
+    spec:
+      data:
+        tls.crt: |
+    REPLACE_WITH_CERT
+        tls.key: |
+    REPLACE_WITH_KEY
+  central-env-resources-2.yaml: |-
+    group: management
+    apiVersion: v1alpha1
+    kind: AmplifyConfig
+    name: amplify
+    title: {{ .Values.global.ampConfigTitle }}
+    metadata:
+      scope:
+        kind: Environment
+        name: {{ .Values.global.environment }}
+    spec:
+      address:
+        interface: 0.0.0.0
+        port: {{ .Values.global.listenerPort }}
+    {{- $root := . -}}
+    {{- range $replicaNum, $e := until (.Values.agentReplicas|int) }}
+    ---
+    group: management
+    apiVersion: v1alpha1
+    kind: GovernanceAgent
+    name: {{ $root.Values.global.agentName }}-{{ $replicaNum }}
+    title: {{ $root.Values.global.agentTitle }} ({{ $replicaNum }})
+    metadata:
+      scope:
+        kind: Environment
+        name: {{ $root.Values.global.environment }}
+    spec:
+      dataplaneType: amplify
+      config: {}
+    {{- end }}
+
+####################################################################
+## Values for ampgw-governance-agent, see sub chart for more values.
+####################################################################
+ampgw-governance-agent:
+  enabled: true
+  env:
+    LOG_LEVEL: info
+
+####################################################################
+## Values for ampgw-proxy, see sub chart for more values.
+####################################################################
+ampgw-proxy:
+  enabled: true
+  replicaCount: 2
+  env:
+    LOGLEVEL: info
+

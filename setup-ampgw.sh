@@ -88,7 +88,7 @@ ampgw-proxy:
 EOF
 
 helm delete ampgw --wait
-helm install ampgw ampc-rel/ampgw -f override.yaml --wait
+helm install ampgw ./helm/ampgw -f override.yaml --wait
 
 echo ============================
 echo === Waiting for all Pods ===

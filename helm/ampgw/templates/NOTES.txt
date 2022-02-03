@@ -1,0 +1,54 @@
+Thank you for installing the {{ .Chart.Name }} chart for Amplify Gateway.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+--- Governance Agent Admin APIs ---
+
+Run these commands:
+
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ index .Values "ampgw-governance-agent" "service" "name" }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[1].containerPort}")
+
+You can watch the status of the Governance Agent pod by running:
+
+  kubectl get --namespace {{ .Release.Namespace }} pod -w $POD_NAME
+
+When the Governance Agent pod is running, run the following port forward command:
+
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ index .Values "ampgw-governance-agent" "service" "ports" "status" "port" }}
+
+Invoke the readiness probe on http://127.0.0.1:{{ index .Values "ampgw-governance-agent" "service" "ports" "status" "port" }}/status
+
+Invoke the admin API on http://127.0.0.1:{{ index .Values "ampgw-governance-agent" "service" "ports" "status" "port" }}/admin/snapshots
+
+{{- if .Values.global.exposeProxyAdminPort }}
+
+--- Proxy Admin API ---
+
+It may take a few minutes for the LoadBalancer IP for the Amplify Gateway to be available. You can watch the status of by it running:
+
+  kubectl get --namespace {{ .Release.Namespace }} svc -w {{ index .Values "ampgw-proxy" "service" "name" }}
+
+When the external LoadBalancer IP is available, you can access the admin API of the proxy by running this command:
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ index .Values "ampgw-proxy" "service" "name" }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+
+Then visit this URL: http://$SERVICE_IP:{{ .Values.global.proxyAdminPort }}
+{{- end }}
+
+--- API traffic ---
+
+It may take a few minutes for the LoadBalancer IP for the Amplify Gateway to be available. You can watch the status of by it running:
+
+  kubectl get --namespace {{ .Release.Namespace }} svc -w {{ index .Values "ampgw-proxy" "service" "name" }}
+
+When the external LoadBalancer IP is available, your DNS server should be configured to map your virtual host to this IP. Once you have deployed virtual APIs to this data plane from Central, you can invoke deployed APIs over TLS on URLs as follows: https://virtual-host:{{ .Values.global.listenerPort }}/path-for-api.
+
+
+
+

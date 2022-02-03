@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ampgw-provisioning
+spec:
+  template:
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: provisioning
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        env:
+          - name: PLATFORM_ENV
+            value: "{{ .Values.provisioning.platformEnv }}"
+          - name: CENTRAL_URL
+            value: "{{ .Values.provisioning.centralUrl }}"
+          - name: CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: ampgw-secret
+                key: clientId
+          - name: SERVICE_ACCOUNT_KEY_FILE
+            value: /keys/serviceAccPrivateKey
+          - name: LISTENER_CERTIFICATE_FILE
+            value: /keys/listenerCertificate
+          - name: LISTENER_PRIVATE_KEY_FILE
+            value: /keys/listenerPrivateKey
+        {{- range $key, $value := .Values.env }}
+          - name: {{ $key | upper | replace "." "_" }}
+            value: {{ $value | quote }}
+        {{- end }}
+        volumeMounts:
+          - name: config-1
+            mountPath: /provisioning/central-env-resources-1.yaml
+            subPath: central-env-resources-1.yaml
+          - name: config-2
+            mountPath: /provisioning/central-env-resources-2.yaml
+            subPath: central-env-resources-2.yaml
+          {{- if .Values.volumeMounts }}
+          {{ toYaml .Values.volumeMounts | nindent 12 }}
+          {{- end }}
+          {{- range $key, $value := .Values.secretMounts }}
+          - name: {{ $key }}
+            mountPath: {{ $value.mountPath }}
+          {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config-1
+          configMap:
+            name: ampgw-provisioning
+        - name: config-2
+          configMap:
+            name: ampgw-provisioning
+        {{- if .Values.volumes }}
+        {{ toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        {{- range $key, $value := .Values.secretMounts }}
+        - name: {{ $key }}
+          secret:
+            secretName: {{ $value.secretName }}
+            defaultMode: {{ $value.defaultMode }}
+        {{- end }}
+      restartPolicy: OnFailure
+  backoffLimit: 4

@@ -1,0 +1,15 @@
+
+config:
+  target: "https://nginx.ampgw.com:8443"
+  tls:
+    rejectUnauthorized: false
+  phases:
+    - duration: 60
+      arrivalRate: 100
+      name: Sustained load
+
+scenarios:
+  - name: "Get hello."
+    flow:
+      - get:
+          url: "/demo/hello"

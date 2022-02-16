@@ -58,6 +58,9 @@ global:
 
 imagePullSecrets:
   - name: regcred
+ampgw-secret-provider-k8s:
+  imagePullSecrets:
+  - name: regcred
 ampgw-governance-agent:
   imagePullSecrets: 
     - name: regcred

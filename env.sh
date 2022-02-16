@@ -1,7 +1,9 @@
-#!/bin/sh
+#!/bin/bash
+
+script_dir=$(dirname ${BASH_SOURCE})
 
 if [ "$ENV" = "preprod" ]; then
- . ./env-preprod.sh
+ . $script_dir/env-preprod.sh
 else
- . ./env-prod.sh
+ . $script_dir/env-prod.sh
 fi

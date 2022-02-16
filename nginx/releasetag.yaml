@@ -1,0 +1,10 @@
+apiVersion: v1alpha1
+group: management
+kind: ReleaseTag
+name: nginx
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: nginx
+spec:
+  releaseType: major

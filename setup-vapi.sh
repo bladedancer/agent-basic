@@ -23,7 +23,10 @@ metadata:
 tags:
   - v1
 spec:
-  domain: "$ENVIRONMENT.ampgw.sandbox.axwaytest.net"
+  domain: "$ENVIRONMENT.ampgw.com"
+  secret:
+    kind: Secret
+    name: ampgw-tls
 ---
 apiVersion: v1alpha1
 group: management
@@ -46,4 +49,4 @@ echo =========
 echo = Test  =
 echo =========
 K8_INGRESS=$(kubectl describe -n kube-system service/traefik | grep "LoadBalancer Ingress" | awk "{print \$3}" | sed "s/,//")
-echo curl -kv --resolve $ENVIRONMENT.ampgw.sandbox.axwaytest.net:8443:$K8_INGRESS https://$ENVIRONMENT.ampgw.sandbox.axwaytest.net:8443/hook/demo
+echo curl -kv --resolve $ENVIRONMENT.ampgw.com:8443:$K8_INGRESS https://$ENVIRONMENT.ampgw.com:8443/hook/demo

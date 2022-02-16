@@ -1,6 +1,0 @@
-apiVersion: v2
-appVersion: 1.20.0
-description: Amplify Gateway Proxy Helm Chart.
-name: ampgw-proxy
-type: application
-version: 0.7.0

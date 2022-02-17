@@ -1,4 +1,9 @@
-. ../env.sh
+#!/bin/bash
+
+DIR=$(dirname `realpath $0`)
+cd ..
+. ./env.sh
+cd $DIR
 
 axway --env $PLATFORM_ENV central delete deployment nginx -s $ENVIRONMENT -y
 sleep 10
@@ -50,4 +55,4 @@ echo =========
 echo = Test  =
 echo =========
 K8_INGRESS=$(kubectl describe -n kube-system service/traefik | grep "LoadBalancer Ingress" | awk "{print \$3}" | sed "s/,//")
-echo curl -kv --resolve nginx.ampgw.com:8443:$K8_INGRESS https://nginx.ampgw.com:8443/demo/hello
+echo curl -ki --resolve nginx.ampgw.com:8443:$K8_INGRESS https://nginx.ampgw.com:8443/demo/hello

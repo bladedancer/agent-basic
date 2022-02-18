@@ -14,7 +14,7 @@ helm install prometheus -n prometheus prometheus-community/kube-prometheus-stack
 --set prometheus.service.port=9090
 
 K8_INGRESS=$(kubectl describe -n kube-system service/traefik | grep "LoadBalancer Ingress" | awk "{print \$3}" | sed "s/,//")
-curl -X POST -H "Content-Type: application/json" -d @./grafanaenvoy-dashboard.json http://$K8_INGRESS/api/dashboards/db -u admin:password
+curl -X POST -H "Content-Type: application/json" -d @./grafana/envoy-dashboard.json http://$K8_INGRESS:3000/api/dashboards/import -u admin:password
 
 echo ============
 echo = Connect  =

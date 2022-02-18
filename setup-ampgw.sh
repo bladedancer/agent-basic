@@ -98,3 +98,7 @@ echo === Waiting for all Pods ===
 echo ============================
 kubectl wait --timeout 10m --for=condition=Complete jobs --all
 
+echo ============================
+echo === Add Service Monitor  ===
+echo ============================
+kubectl apply -f prometheus/envoy-servicemonitor.yaml

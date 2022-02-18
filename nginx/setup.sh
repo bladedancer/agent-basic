@@ -1,9 +1,11 @@
 #!/bin/bash
 
-DIR=$(dirname `realpath $0`)
-cd ..
+ORIG_DIR=$CWD
+ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+cd $ROOTDIR/..
 . ./env.sh
-cd $DIR
+cd $ROOTDIR
 
 axway --env $PLATFORM_ENV central delete deployment nginx -s $ENVIRONMENT -y
 sleep 10
@@ -56,3 +58,5 @@ echo = Test  =
 echo =========
 K8_INGRESS=$(kubectl describe -n kube-system service/traefik | grep "LoadBalancer Ingress" | awk "{print \$3}" | sed "s/,//")
 echo curl -ki --resolve nginx.ampgw.com:8443:$K8_INGRESS https://nginx.ampgw.com:8443/demo/hello
+
+cd $ORIG_DIR

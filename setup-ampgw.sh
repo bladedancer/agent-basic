@@ -2,11 +2,6 @@
 
 . ./env.sh
 
-#echo ================================
-#echo === Bootstraping images      ===
-#echo ================================
-#docker pull axway.jfrog.io/ampc-docker-release-ptx/ampgw-install-axway-cli:0.6.0  
-
 echo ================================
 echo === Creating Service Account ===
 echo ================================

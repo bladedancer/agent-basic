@@ -1,5 +1,4 @@
 {
-  "dashboard": {
     "annotations": {
       "list": [
         {
@@ -759,6 +758,4 @@
     "uid": "envoymetrics",
     "version": 1,
     "weekStart": ""
-  },
-  "overwrite": true
-}
+  }

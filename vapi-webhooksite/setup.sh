@@ -5,6 +5,8 @@ ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 cd $ROOTDIR/..
 . ./env.sh
+cd $ROOTDIR
+
 
 axway --env $PLATFORM_ENV central delete deployment webhooksite -s $ENVIRONMENT -y
 sleep 10

@@ -1,29 +1,29 @@
 apiVersion: v1alpha1
 group: management
 kind: VirtualAPI
-name: webhooksite
+name: nginx
 spec:
   type: REST
 ---
 group: management
 apiVersion: v1alpha1
 kind: VirtualService
-name: webhooksite
+name: nginx
 metadata:
   scope:
     kind: VirtualAPI
-    name: webhooksite
+    name: nginx
 spec:
-  prefix: /hook
+  prefix: /demo
   route:
     - service:
-        prefix: /f249ac55-21f7-4f3e-ab29-ab69513aa32c
-        protocol: https
+        prefix: /
+        protocol: http
         codec: AUTO
         endpoints:
-          - host: webhook.site
-            port: 443
+          - host: nginx.default.svc.cluster.local
+            port: 8082
       operations:
-        - id: getDemo
-          path: /demo
+        - id: getHello
+          path: /hello
           method: GET

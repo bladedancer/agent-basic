@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: prometheus
+  name: envoy
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ampgw
+      app.kubernetes.io/name: ampgw-proxy
+  namespaceSelector:
+    matchNames:
+      - default
+  endpoints:
+  - targetPort: 9901
+    interval: 30s
+    path: /stats/prometheus

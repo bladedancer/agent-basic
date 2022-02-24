@@ -2,11 +2,6 @@
 
 . ./env.sh
 
-#echo ================================
-#echo === Bootstraping images      ===
-#echo ================================
-#docker pull axway.jfrog.io/ampc-docker-release-ptx/ampgw-install-axway-cli:0.6.0  
-
 echo ================================
 echo === Creating Service Account ===
 echo ================================
@@ -58,6 +53,9 @@ global:
 
 imagePullSecrets:
   - name: regcred
+ampgw-secret-provider-k8s:
+  imagePullSecrets:
+  - name: regcred
 ampgw-governance-agent:
   imagePullSecrets: 
     - name: regcred
@@ -95,3 +93,7 @@ echo === Waiting for all Pods ===
 echo ============================
 kubectl wait --timeout 10m --for=condition=Complete jobs --all
 
+echo ============================
+echo === Add Service Monitor  ===
+echo ============================
+kubectl apply -f prometheus/envoy-servicemonitor.yaml

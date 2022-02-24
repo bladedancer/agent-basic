@@ -22,7 +22,7 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 28,
+    "id": null,
     "links": [],
     "liveNow": true,
     "panels": [
@@ -760,5 +760,7 @@
     "version": 1,
     "weekStart": ""
   },
-  "overwrite": true
+  "overwrite": true,
+  "inputs": [],
+  "folderId": 0
 }

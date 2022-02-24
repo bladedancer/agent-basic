@@ -13,10 +13,17 @@ ACC=$(axway --env $PLATFORM_ENV service-account create --name $ENVIRONMENT --pub
 CLIENT_ID=$(echo $ACC | jq -r .client.client_id)
 ORG_ID=$(echo $ACC | jq -r .org.id)
 
-echo ==============================
-echo === Creating Listener Cert ===
-echo ==============================
-openssl req -x509 -newkey rsa:4096 -keyout listener_private_key.pem -nodes -out listener_certificate.pem -days 365 -subj '/CN=*.ampgw.com/O=Axway/C=IE'
+echo ===========================
+echo === Check Listener Cert ===
+echo ===========================
+if [ ! -f ${ENVIRONMENT}-listener-private-key.pem ]; then 
+  echo "Private key not found: ${ENVIRONMENT}-listener-private-key.pem"
+  exit 1
+fi
+if [ ! -f ${ENVIRONMENT}-listener-certificate.pem ]; then 
+  echo "Certificate not found: ${ENVIRONMENT}-listener-certificate.pem"
+  exit 1
+fi
 
 echo =============================
 echo === Creating AmpGw Secret ===
@@ -25,8 +32,8 @@ kubectl delete secret ampgw-secret
 kubectl create secret generic ampgw-secret \
     --from-file serviceAccPrivateKey=private_key.pem \
     --from-file serviceAccPublicKey=public_key.pem \
-    --from-file listenerPrivateKey=listener_private_key.pem  \
-    --from-file listenerCertificate=listener_certificate.pem \
+    --from-file listenerPrivateKey=${ENVIRONMENT}-listener-private-key.pem  \
+    --from-file listenerCertificate=${ENVIRONMENT}-listener-certificate.pem \
     --from-literal orgId=$ORG_ID \
     --from-literal clientId=$CLIENT_ID
 
@@ -83,6 +90,15 @@ provisioning:
 ampgw-proxy:
   imagePullSecrets:
     - name: regcred
+  service:
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: "*.${ENVIRONMENT}.sandbox.ampc.axwaytest.net"
+    portsTemplate:
+      https: |-
+        port: 443
+        targetPort: {{ .Values.global.listenerPort }}
+        protocol: TCP
+
 EOF
 
 helm delete ampgw --wait

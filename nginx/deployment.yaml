@@ -9,7 +9,7 @@ metadata:
 tags:
   - v1
 spec:
-  domain: "nginx.ampgw.com"
+  domain: "nginx.gmdemo.sandbox.ampc.axwaytest.net"
   secret:
     kind: Secret
     name: ampgw-tls

@@ -1,13 +1,15 @@
 
 config:
-  target: "https://nginx.ampgw.com:8443"
+  target: "https://nginx.gmdemo.sandbox.ampc.axwaytest.net"
   tls:
     rejectUnauthorized: false
+  #http:
+  #  pool: 10
   http:
-    pool: 10
+    timeout: 30
   phases:
-    - duration: 1200
-      arrivalRate: 100
+    - duration: 60
+      arrivalRate: 600
       name: Sustained load
 
 scenarios:

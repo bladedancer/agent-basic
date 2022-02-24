@@ -9,7 +9,7 @@ metadata:
 tags:
   - v1
 spec:
-  domain: "gmdemo.ampgw.com"
+  domain: "webhook.gmdemo.sandbox.ampc.axwaytest.net"
   secret:
     kind: Secret
     name: ampgw-tls

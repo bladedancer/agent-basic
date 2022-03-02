@@ -2,6 +2,14 @@
 
 . ./env.sh
 
+
+echo ================================
+echo === Create Namespace ${AMGPW_NAMESPACE:-default}
+echo ================================
+if [ ! -z "${AMGPW_NAMESPACE}" ]; then
+  kubectl create namespace ${AMGPW_NAMESPACE}
+fi
+
 echo ================================
 echo === Creating Service Account ===
 echo ================================
@@ -21,8 +29,9 @@ openssl req -x509 -newkey rsa:4096 -keyout listener_private_key.pem -nodes -out 
 echo =============================
 echo === Creating AmpGw Secret ===
 echo =============================
-kubectl delete secret ampgw-secret
+kubectl delete secret ampgw-secret -n ${AMGPW_NAMESPACE:-default}
 kubectl create secret generic ampgw-secret \
+    -n ${AMGPW_NAMESPACE:-default} \
     --from-file serviceAccPrivateKey=private_key.pem \
     --from-file serviceAccPublicKey=public_key.pem \
     --from-file listenerPrivateKey=listener_private_key.pem  \
@@ -34,6 +43,8 @@ echo ================================
 echo === Deleting Environment    ===
 echo ================================
 axway --env $PLATFORM_ENV central delete env $ENVIRONMENT -y
+
+
 
 echo ============================
 echo === Installing Dataplane ===
@@ -85,13 +96,13 @@ ampgw-proxy:
     - name: regcred
 EOF
 
-helm delete ampgw --wait
-helm install ampgw ampc-rel/ampgw -f override.yaml --wait
+helm delete ampgw -n ${AMGPW_NAMESPACE:-default} --wait
+helm install ampgw ampc-rel/ampgw -f override.yaml -n ${AMGPW_NAMESPACE:-default} --wait
 
 echo ============================
 echo === Waiting for all Pods ===
 echo ============================
-kubectl wait --timeout 10m --for=condition=Complete jobs --all
+kubectl -n ${AMGPW_NAMESPACE:-default} wait --timeout 10m --for=condition=Complete jobs --all
 
 echo ============================
 echo === Add Service Monitor  ===

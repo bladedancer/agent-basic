@@ -17,7 +17,7 @@ spec:
   prefix: /hook
   route:
     - service:
-        prefix: /f249ac55-21f7-4f3e-ab29-ab69513aa32c
+        prefix: /3ab78d83-e0da-4cab-b03e-12e60cc9cfe1
         protocol: https
         codec: AUTO
         endpoints:

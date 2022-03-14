@@ -7,8 +7,8 @@ config:
     pool: 10
     timeout: 30
   phases:
-    - duration: 2400
-      arrivalRate: 200
+    - duration: 240
+      arrivalRate: 50
       name: Sustained load
 
 scenarios:

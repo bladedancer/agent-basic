@@ -3,17 +3,17 @@ kind: ServiceMonitor
 metadata:
   labels:
     release: prometheus
-  name: envoy
+  name: agent
   namespace: prometheus
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/instance: ampgw
-      app.kubernetes.io/name: ampgw-proxy
+      app.kubernetes.io/name: ampgw-governance-agent
   namespaceSelector:
     matchNames:
       - ampgw
   endpoints:
-  - targetPort: 9901
+  - targetPort: 8090
     interval: 30s
-    path: /stats/prometheus
+    path: /metrics

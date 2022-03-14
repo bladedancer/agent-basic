@@ -54,6 +54,8 @@ IFS=':'
 read -a userpass <<< "$CREDS"
 helm repo add --force-update ampc-rel https://axway.jfrog.io/artifactory/ampc-helm-release --username ${userpass[0]} --password ${userpass[1]}
 
+helm repo add --force-update --insecure-skip-tls-verify ampc-snap https://artifactory-phx.ecd.axway.int/artifactory/ampc-helm-snapshot
+
 cat << EOF > override.yaml
 global:
   environment: $ENVIRONMENT
@@ -97,7 +99,8 @@ ampgw-proxy:
 EOF
 
 helm delete ampgw -n ${AMGPW_NAMESPACE:-default} --wait
-helm install ampgw ampc-rel/ampgw -f override.yaml -n ${AMGPW_NAMESPACE:-default} --wait
+#helm install ampgw ampc-rel/ampgw -f override.yaml -n ${AMGPW_NAMESPACE:-default} --wait
+helm install --insecure-skip-tls-verify ampgw ampc-snap/ampgw --version 0.9.0-POC-0016-obs-SNAPSHOT -f override.yaml -n ${AMGPW_NAMESPACE:-default} --wait
 
 echo ============================
 echo === Waiting for all Pods ===
@@ -108,3 +111,4 @@ echo ============================
 echo === Add Service Monitor  ===
 echo ============================
 kubectl apply -f prometheus/envoy-servicemonitor.yaml
+kubectl apply -f prometheus/agent-servicemonitor.yaml

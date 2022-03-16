@@ -1,0 +1,31 @@
+apiVersion: v1alpha1
+group: management
+kind: VirtualAPI
+name: nginx
+spec:
+  type: REST
+---
+group: management
+apiVersion: v1alpha1
+kind: VirtualService
+name: nginx
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: nginx
+spec:
+  prefix: /api/v1/demo
+  auth:
+    kind: PassthroughAuthRule
+  route:
+    - service:
+        prefix: /
+        protocol: http
+        codec: AUTO
+        endpoints:
+          - host: nginx.default.svc.cluster.local
+            port: 8082
+      operations:
+        - id: getHello
+          path: /hello
+          method: GET

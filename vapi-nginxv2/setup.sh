@@ -7,12 +7,10 @@ cd $ROOTDIR/..
 . ./env.sh
 cd $ROOTDIR
 
-axway --env $PLATFORM_ENV central delete deployment nginx -s $ENVIRONMENT -y
-sleep 10
-axway --env $PLATFORM_ENV central delete virtualapi nginx -y
+axway --env $PLATFORM_ENV central delete deployment nginxv2 -s $ENVIRONMENT -y
 sleep 10
 
-kubectl apply -f backend/v1-dep.yaml
+kubectl apply -f backend/v2-dep.yaml
 
 axway --env $PLATFORM_ENV central apply -f proxy/vapi.yaml
 axway --env $PLATFORM_ENV central apply -f proxy/releasetag.yaml
@@ -22,22 +20,6 @@ sleep 20
 cat << EOF > proxy/deployment.yaml
 apiVersion: v1alpha1
 group: management
-kind: VirtualHost
-name: nginx
-metadata:
-  scope:
-    kind: Environment
-    name: $ENVIRONMENT
-tags:
-  - v1
-spec:
-  domain: "nginx.ampgw.com"
-  secret:
-    kind: Secret
-    name: ampgw-tls
----
-apiVersion: v1alpha1
-group: management
 kind: Deployment
 name: nginx
 metadata:
@@ -45,9 +27,9 @@ metadata:
     kind: Environment
     name: $ENVIRONMENT
 tags:
-  - v1
+  - v2
 spec:
-  virtualAPIRelease: nginx-1.0.0
+  virtualAPIRelease: nginx-2.0.0
   virtualHost: nginx
 EOF
 
@@ -57,6 +39,6 @@ echo =========
 echo = Test  =
 echo =========
 K8_INGRESS=$(kubectl describe -n kube-system service/traefik | grep "LoadBalancer Ingress" | awk "{print \$3}" | sed "s/,//")
-echo curl -ki --resolve nginx.ampgw.com:8443:$K8_INGRESS https://nginx.ampgw.com:8443/api/v1/demo/hello
+echo curl -ki --resolve nginx.ampgw.com:8443:$K8_INGRESS https://nginx.ampgw.com:8443/api/v2/demo/hello
 
 cd $ORIG_DIR

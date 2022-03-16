@@ -1,0 +1,13 @@
+apiVersion: v1alpha1
+group: management
+kind: Deployment
+name: nginx
+metadata:
+  scope:
+    kind: Environment
+    name: gmdemo
+tags:
+  - v2
+spec:
+  virtualAPIRelease: nginx-2.0.0
+  virtualHost: nginx

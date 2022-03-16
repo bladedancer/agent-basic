@@ -14,7 +14,7 @@ metadata:
     kind: VirtualAPI
     name: nginx
 spec:
-  prefix: /demo
+  prefix: /api/v1/demo
   auth:
     kind: PassthroughAuthRule
   route:
@@ -24,6 +24,31 @@ spec:
         codec: AUTO
         endpoints:
           - host: nginx.default.svc.cluster.local
+            port: 8082
+      operations:
+        - id: getHello
+          path: /hello
+          method: GET
+---
+group: management
+apiVersion: v1alpha1
+kind: VirtualService
+name: nginxv2
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: nginx
+spec:
+  prefix: /api/v2/demo
+  auth:
+    kind: PassthroughAuthRule
+  route:
+    - service:
+        prefix: /
+        protocol: http
+        codec: AUTO
+        endpoints:
+          - host: nginxv2.default.svc.cluster.local
             port: 8082
       operations:
         - id: getHello

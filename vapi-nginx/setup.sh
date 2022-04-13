@@ -12,14 +12,14 @@ sleep 10
 axway --env $PLATFORM_ENV central delete virtualapi nginx -y
 sleep 10
 
-kubectl apply -f k8s-dep.yaml
+kubectl apply -f backend/v1-dep.yaml
 
-axway --env $PLATFORM_ENV central apply -f vapi.yaml
-axway --env $PLATFORM_ENV central apply -f releasetag.yaml
+axway --env $PLATFORM_ENV central apply -f proxy/vapi.yaml
+axway --env $PLATFORM_ENV central apply -f proxy/releasetag.yaml
 sleep 20
 
 
-cat << EOF > deployment.yaml
+cat << EOF > proxy/deployment.yaml
 apiVersion: v1alpha1
 group: management
 kind: VirtualHost
@@ -51,7 +51,7 @@ spec:
   virtualHost: nginx
 EOF
 
-axway --env $PLATFORM_ENV central apply -f deployment.yaml
+axway --env $PLATFORM_ENV central apply -f proxy/deployment.yaml
 
 echo =========
 echo = Test  =

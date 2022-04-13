@@ -6,10 +6,11 @@ config:
   #http:
   #  pool: 10
   http:
+    pool: 10
     timeout: 30
   phases:
-    - duration: 60
-      arrivalRate: 600
+    - duration: 2400
+      arrivalRate: 200
       name: Sustained load
 
 scenarios:

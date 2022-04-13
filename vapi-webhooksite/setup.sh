@@ -6,6 +6,10 @@ ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $ROOTDIR/..
 . ./env.sh
 cd $ROOTDIR
+<<<<<<< HEAD:webhooksite/setup.sh
+=======
+
+>>>>>>> main:vapi-webhooksite/setup.sh
 
 axway --env $PLATFORM_ENV central delete deployment webhooksite -s $ENVIRONMENT -y
 sleep 10
@@ -53,6 +57,11 @@ axway --env $PLATFORM_ENV central apply -f ./deployment.yaml
 echo =========
 echo = Test  =
 echo =========
+<<<<<<< HEAD:webhooksite/setup.sh
 echo curl -i https://webhook.$ENVIRONMENT.sandbox.ampc.axwaytest.net/hook/demo
+=======
+K8_INGRESS=$(kubectl describe -n kube-system service/traefik | grep "LoadBalancer Ingress" | awk "{print \$3}" | sed "s/,//")
+echo curl -ki --resolve $ENVIRONMENT.ampgw.com:8443:$K8_INGRESS https://$ENVIRONMENT.ampgw.com:8443/hook/demo
+>>>>>>> main:vapi-webhooksite/setup.sh
 
 cd $ORIG_DIR

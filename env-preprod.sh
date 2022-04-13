@@ -16,6 +16,8 @@ export TRACEABILITY_REDACTION_QUERYARGUMENT_SHOW=[{keyMatch:".*"}]
 export TRACEABILITY_REDACTION_REQUESTHEADER_SHOW=[{keyMatch:".*"}]
 export TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW=[{keyMatch:".*"}]
 
+export AMGPW_NAMESPACE=ampgw
+
 axway --env $PLATFORM_ENV auth login 
 
 axway central config set --platform=$PLATFORM_ENV

@@ -6,5 +6,5 @@
 ./setup-cluster.sh
 ./setup-prometheus.sh
 ./setup-ampgw.sh
-./webhooksite/setup.sh
-./nginx/setup.sh
+./vapi-webhooksite/setup.sh
+./vapi-nginx/setup.sh

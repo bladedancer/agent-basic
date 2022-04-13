@@ -7,23 +7,20 @@ cd $ROOTDIR/..
 . ./env.sh
 cd $ROOTDIR
 
-axway --env $PLATFORM_ENV central delete deployment nginx -s $ENVIRONMENT -y
+axway --env $PLATFORM_ENV central delete deployment jsonplaceholder -s $ENVIRONMENT -y
 sleep 10
-axway --env $PLATFORM_ENV central delete virtualapi nginx -y
+axway --env $PLATFORM_ENV central delete virtualapi jsonplaceholder -y
 sleep 10
 
-kubectl apply -f backend/v1-dep.yaml
-
-axway --env $PLATFORM_ENV central apply -f proxy/vapi.yaml
-axway --env $PLATFORM_ENV central apply -f proxy/releasetag.yaml
+axway --env $PLATFORM_ENV central apply -f ./vapi.yaml
+axway --env $PLATFORM_ENV central apply -f ./releasetag.yaml
 sleep 20
 
-
-cat << EOF > proxy/deployment.yaml
+cat << EOF > ./deployment.yaml
 apiVersion: v1alpha1
 group: management
 kind: ExternalSecret
-name: $ENVIRONMENT-nginx
+name: $ENVIRONMENT-jsonplaceholder
 metadata:
   scope:
     kind: Environment
@@ -32,7 +29,7 @@ tags:
   - v1
 spec:
   config:
-    provider: kubernetes
+    provider: Kubernetes
     name: ampgw-secret
     namespace: ampgw
   data:
@@ -43,7 +40,7 @@ spec:
 apiVersion: v1alpha1
 group: management
 kind: VirtualHost
-name: $ENVIRONMENT-nginx
+name: $ENVIRONMENT-jsonplaceholder
 metadata:
   scope:
     kind: Environment
@@ -51,15 +48,15 @@ metadata:
 tags:
   - v1
 spec:
-  domain: "nginx.$ENVIRONMENT.sandbox.ampc.axwaytest.net"
+  domain: "jsonplaceholder.$ENVIRONMENT.sandbox.ampc.axwaytest.net"
   secret:
     kind: ExternalSecret
-    name: $ENVIRONMENT-nginx
+    name: $ENVIRONMENT-jsonplaceholder
 ---
 apiVersion: v1alpha1
 group: management
 kind: Deployment
-name: nginx
+name: jsonplaceholder
 metadata:
   scope:
     kind: Environment
@@ -67,15 +64,15 @@ metadata:
 tags:
   - v1
 spec:
-  virtualAPIRelease: nginx-1.0.0
-  virtualHost: $ENVIRONMENT-nginx
+  virtualAPIRelease: jsonplaceholder-1.0.0
+  virtualHost: $ENVIRONMENT-jsonplaceholder
 EOF
 
-axway --env $PLATFORM_ENV central apply -f proxy/deployment.yaml
+axway --env $PLATFORM_ENV central apply -f ./deployment.yaml
 
 echo =========
 echo = Test  =
 echo =========
-echo curl -i https://nginx.$ENVIRONMENT.sandbox.ampc.axwaytest.net/demo/hello
+echo curl -i https://jsonplaceholder.$ENVIRONMENT.sandbox.ampc.axwaytest.net/json/todos/1
 
 cd $ORIG_DIR

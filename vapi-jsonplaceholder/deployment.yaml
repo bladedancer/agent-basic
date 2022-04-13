@@ -1,7 +1,7 @@
 apiVersion: v1alpha1
 group: management
 kind: ExternalSecret
-name: gmdemo-webhook
+name: gmdemo-jsonplaceholder
 metadata:
   scope:
     kind: Environment
@@ -21,7 +21,7 @@ spec:
 apiVersion: v1alpha1
 group: management
 kind: VirtualHost
-name: gmdemo-webhook
+name: gmdemo-jsonplaceholder
 metadata:
   scope:
     kind: Environment
@@ -29,15 +29,15 @@ metadata:
 tags:
   - v1
 spec:
-  domain: "webhook.gmdemo.sandbox.ampc.axwaytest.net"
+  domain: "jsonplaceholder.gmdemo.sandbox.ampc.axwaytest.net"
   secret:
     kind: ExternalSecret
-    name: gmdemo-webhook
+    name: gmdemo-jsonplaceholder
 ---
 apiVersion: v1alpha1
 group: management
 kind: Deployment
-name: webhooksite
+name: jsonplaceholder
 metadata:
   scope:
     kind: Environment
@@ -45,5 +45,5 @@ metadata:
 tags:
   - v1
 spec:
-  virtualAPIRelease: webhooksite-1.0.0
-  virtualHost: gmdemo-webhook
+  virtualAPIRelease: jsonplaceholder-1.0.0
+  virtualHost: gmdemo-jsonplaceholder

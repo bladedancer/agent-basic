@@ -12,7 +12,7 @@ spec:
   domain: "nginx.gmdemo.sandbox.ampc.axwaytest.net"
   secret:
     kind: Secret
-    name: ampgw-tls
+    name: ampgw-secret
 ---
 apiVersion: v1alpha1
 group: management

@@ -1,18 +1,38 @@
 apiVersion: v1alpha1
 group: management
-kind: VirtualHost
-name: nginx
+kind: ExternalSecret
+name: resource-vapi-nginx
 metadata:
   scope:
     kind: Environment
-    name: gmdemo
+    name: resource-vapi
 tags:
   - v1
 spec:
-  domain: "nginx.ampgw.com"
+  config:
+    provider: Kubernetes
+    name: ampgw-secret
+    namespace: ampgw
+  data:
+    kind: TLS
+    privateKeyAlias: listenerPrivateKey
+    certificateAlias: listenerCertificate
+---
+apiVersion: v1alpha1
+group: management
+kind: VirtualHost
+name: resource-vapi-nginx
+metadata:
+  scope:
+    kind: Environment
+    name: resource-vapi
+tags:
+  - v1
+spec:
+  domain: "nginx.resource-vapi.sandbox.ampc.axwaytest.net"
   secret:
-    kind: Secret
-    name: ampgw-tls
+    kind: ExternalSecret
+    name: resource-vapi-nginx
 ---
 apiVersion: v1alpha1
 group: management
@@ -21,9 +41,9 @@ name: nginx
 metadata:
   scope:
     kind: Environment
-    name: gmdemo
+    name: resource-vapi
 tags:
   - v1
 spec:
   virtualAPIRelease: nginx-1.0.0
-  virtualHost: nginx
+  virtualHost: resource-vapi-nginx

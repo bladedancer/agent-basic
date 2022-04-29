@@ -1,2 +1,3 @@
 *.pem
 override.yaml
+./**/deployment.yaml

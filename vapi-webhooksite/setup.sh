@@ -20,8 +20,8 @@ sleep 20
 cat << EOF > ./deployment.yaml
 apiVersion: v1alpha1
 group: management
-kind: VirtualHost
-name: $ENVIRONMENT
+kind: ExternalSecret
+name: $ENVIRONMENT-webhooksite
 metadata:
   scope:
     kind: Environment
@@ -29,10 +29,30 @@ metadata:
 tags:
   - v1
 spec:
-  domain: "$ENVIRONMENT.ampgw.com"
+  config:
+    provider: Kubernetes
+    name: ampgw-secret
+    namespace: ampgw
+  data:
+    kind: TLS
+    privateKeyAlias: listenerPrivateKey
+    certificateAlias: listenerCertificate
+---
+apiVersion: v1alpha1
+group: management
+kind: VirtualHost
+name: $ENVIRONMENT-webhooksite
+metadata:
+  scope:
+    kind: Environment
+    name: $ENVIRONMENT
+tags:
+  - v1
+spec:
+  domain: "webhooksite.$ENVIRONMENT.sandbox.ampc.axwaytest.net"
   secret:
-    kind: Secret
-    name: ampgw-tls
+    kind: ExternalSecret
+    name: $ENVIRONMENT-webhooksite
 ---
 apiVersion: v1alpha1
 group: management
@@ -46,7 +66,7 @@ tags:
   - v1
 spec:
   virtualAPIRelease: webhooksite-1.0.0
-  virtualHost: $ENVIRONMENT
+  virtualHost: $ENVIRONMENT-webhooksite
 EOF
 
 axway --env $PLATFORM_ENV central apply -f ./deployment.yaml
@@ -55,6 +75,6 @@ echo =========
 echo = Test  =
 echo =========
 K8_INGRESS=$(kubectl describe -n kube-system service/traefik | grep "LoadBalancer Ingress" | awk "{print \$3}" | sed "s/,//")
-echo curl -ki --resolve $ENVIRONMENT.ampgw.com:8443:$K8_INGRESS https://$ENVIRONMENT.ampgw.com:8443/hook/demo
+echo curl -ki --resolve webhooksite.$ENVIRONMENT.sandbox.ampc.axwaytest.net:8443:$K8_INGRESS https://webhooksite.$ENVIRONMENT.sandbox.ampc.axwaytest.net:8443/hook/demo
 
 cd $ORIG_DIR

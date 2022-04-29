@@ -21,10 +21,10 @@ ACC=$(axway --env $PLATFORM_ENV service-account create --name $ENVIRONMENT --pub
 CLIENT_ID=$(echo $ACC | jq -r .client.client_id)
 ORG_ID=$(echo $ACC | jq -r .org.id)
 
-echo ==============================
-echo === Creating Listener Cert ===
-echo ==============================
-openssl req -x509 -newkey rsa:4096 -keyout listener_private_key.pem -nodes -out listener_certificate.pem -days 365 -subj '/CN=*.ampgw.com/O=Axway/C=IE'
+#echo ==============================
+#echo === Creating Listener Cert ===
+#echo ==============================
+#openssl req -x509 -newkey rsa:4096 -keyout $ENVIRONMENT-listener-private-key.pem -nodes -out $ENVIRONMENT-listener-certificate.pem -days 365 -subj '/CN=*.ampgw.com/O=Axway/C=IE'
 
 echo =============================
 echo === Creating AmpGw Secret ===
@@ -34,8 +34,8 @@ kubectl create secret generic ampgw-secret \
     -n ${AMGPW_NAMESPACE:-default} \
     --from-file serviceAccPrivateKey=private_key.pem \
     --from-file serviceAccPublicKey=public_key.pem \
-    --from-file listenerPrivateKey=listener_private_key.pem  \
-    --from-file listenerCertificate=listener_certificate.pem \
+    --from-file listenerPrivateKey=$ENVIRONMENT-listener-private-key.pem  \
+    --from-file listenerCertificate=$ENVIRONMENT-listener-certificate.pem \
     --from-literal orgId=$ORG_ID \
     --from-literal clientId=$CLIENT_ID
 
@@ -43,8 +43,6 @@ echo ================================
 echo === Deleting Environment    ===
 echo ================================
 axway --env $PLATFORM_ENV central delete env $ENVIRONMENT -y
-
-
 
 echo ============================
 echo === Installing Dataplane ===
@@ -61,12 +59,29 @@ global:
   listenerPort: 8443
   exposeProxyAdminPort: true
   proxyAdminPort: 9901
+  tlsExternalSecretName: ampgw-secret
 
 imagePullSecrets:
   - name: regcred
 ampgw-secret-provider-k8s:
   imagePullSecrets:
   - name: regcred
+ampgw-traceability-agent:
+  imagePullSecrets:
+  - name: regcred
+  env:
+    CENTRAL_AUTH_URL: $CENTRAL_AUTH_URL
+    CENTRAL_URL: $CENTRAL_URL
+    CENTRAL_DEPLOYMENT: $CENTRAL_DEPLOYMENT
+    CENTRAL_PLATFORM_URL: $CENTRAL_PLATFORM_URL
+    CENTRAL_USAGEREPORTING_URL: $CENTRAL_USAGEREPORTING_URL
+    TRACEABILITY_HOST: $TRACEABILITY_HOST
+    TRACEABILITY_PROTOCOL: $TRACEABILITY_PROTOCOL
+    TRACEABILITY_REDACTION_PATH_SHOW: "$TRACEABILITY_REDACTION_PATH_SHOW"
+    TRACEABILITY_REDACTION_QUERYARGUMENT_SHOW: "$TRACEABILITY_REDACTION_QUERYARGUMENT_SHOW"
+    TRACEABILITY_REDACTION_REQUESTHEADER_SHOW: "$TRACEABILITY_REDACTION_REQUESTHEADER_SHOW"
+    TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW: "$TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW"
+
 ampgw-governance-agent:
   imagePullSecrets: 
     - name: regcred
@@ -77,15 +92,9 @@ ampgw-governance-agent:
   env:
     CENTRAL_AUTH_URL: $CENTRAL_AUTH_URL
     CENTRAL_URL: $CENTRAL_URL
-    CENTRAL_USAGEREPORTING_URL: $CENTRAL_USAGEREPORTING_URL
     CENTRAL_DEPLOYMENT: $CENTRAL_DEPLOYMENT
     CENTRAL_PLATFORM_URL: $CENTRAL_PLATFORM_URL
-    TRACEABILITY_HOST: $TRACEABILITY_HOST
-    TRACEABILITY_PROTOCOL: $TRACEABILITY_PROTOCOL
-    TRACEABILITY_REDACTION_PATH_SHOW: "$TRACEABILITY_REDACTION_PATH_SHOW"
-    TRACEABILITY_REDACTION_QUERYARGUMENT_SHOW: "$TRACEABILITY_REDACTION_QUERYARGUMENT_SHOW"
-    TRACEABILITY_REDACTION_REQUESTHEADER_SHOW: "$TRACEABILITY_REDACTION_REQUESTHEADER_SHOW"
-    TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW: "$TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW"
+
 
 provisioning:
   platformEnv: $PLATFORM_ENV

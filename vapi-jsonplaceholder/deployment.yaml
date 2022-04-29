@@ -1,11 +1,11 @@
 apiVersion: v1alpha1
 group: management
 kind: ExternalSecret
-name: gmdemo-webhooksite
+name: resource-vapi-jsonplaceholder
 metadata:
   scope:
     kind: Environment
-    name: gmdemo
+    name: resource-vapi
 tags:
   - v1
 spec:
@@ -21,29 +21,29 @@ spec:
 apiVersion: v1alpha1
 group: management
 kind: VirtualHost
-name: gmdemo-webhooksite
+name: resource-vapi-jsonplaceholder
 metadata:
   scope:
     kind: Environment
-    name: gmdemo
+    name: resource-vapi
 tags:
   - v1
 spec:
-  domain: "webhooksite.gmdemo.sandbox.ampc.axwaytest.net"
+  domain: "jsonplaceholder.resource-vapi.sandbox.ampc.axwaytest.net"
   secret:
     kind: ExternalSecret
-    name: gmdemo-webhooksite
+    name: resource-vapi-jsonplaceholder
 ---
 apiVersion: v1alpha1
 group: management
 kind: Deployment
-name: webhooksite
+name: jsonplaceholder
 metadata:
   scope:
     kind: Environment
-    name: gmdemo
+    name: resource-vapi
 tags:
   - v1
 spec:
-  virtualAPIRelease: webhooksite-1.0.0
-  virtualHost: gmdemo-webhooksite
+  virtualAPIRelease: jsonplaceholder-1.0.0
+  virtualHost: resource-vapi-jsonplaceholder

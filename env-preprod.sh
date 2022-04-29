@@ -3,7 +3,7 @@
 export ENVIRONMENT=gmdemo
 export ENVIRONMENT_TITLE="GM Demo"
 
-export PLATFORM_ENV=preprod
+export PLATFORM_ENV=staging
 export CENTRAL_AUTH_URL=https://login.axwaytest.net/auth
 export CENTRAL_URL=https://gmatthews.dev.ampc.axwaytest.net
 export CENTRAL_USAGEREPORTING_URL=https://lighthouse-staging.admin.staging.appctest.com

@@ -1,0 +1,26 @@
+group: management
+apiVersion: v1alpha1
+kind: ManagedApplication
+name: gmapp
+metadata:
+  scope:
+    kind: Environment
+    name: gmdemo
+spec: {}
+---
+group: management
+apiVersion: v1alpha1
+kind: AccessRequest
+name: gmapp
+metadata:
+  scope:
+    kind: Environment
+    name: gmdemo
+spec:
+  apiServiceInstance: webhooksite-axwayid-ins
+  managedApplication: gmapp
+  data:
+    apiId: "webhooksite-axwayid"
+    subscriptionId: "gmapp"
+    clientType: "JWT"
+    clientId: gmdemo-gmapp_d6e11980-54fd-45e9-b536-1e38378e6155

@@ -1,11 +1,11 @@
 apiVersion: v1alpha1
 group: management
 kind: ExternalSecret
-name: resource-vapi-nginx
+name: gmdemo-webhooksite-axwayid
 metadata:
   scope:
     kind: Environment
-    name: resource-vapi
+    name: gmdemo
 tags:
   - v1
 spec:
@@ -21,29 +21,29 @@ spec:
 apiVersion: v1alpha1
 group: management
 kind: VirtualHost
-name: resource-vapi-nginx
+name: gmdemo-webhooksite-axwayid
 metadata:
   scope:
     kind: Environment
-    name: resource-vapi
+    name: gmdemo
 tags:
   - v1
 spec:
-  domain: "nginx.resource-vapi.sandbox.ampc.axwaytest.net"
+  domain: "webhooksite-axwayid.gmdemo.sandbox.ampc.axwaytest.net"
   secret:
     kind: ExternalSecret
-    name: resource-vapi-nginx
+    name: gmdemo-webhooksite-axwayid
 ---
 apiVersion: v1alpha1
 group: management
 kind: Deployment
-name: nginx
+name: webhooksite-axwayid
 metadata:
   scope:
     kind: Environment
-    name: resource-vapi
+    name: gmdemo
 tags:
   - v1
 spec:
-  virtualAPIRelease: nginx-1.0.0
-  virtualHost: resource-vapi-nginx
+  virtualAPIRelease: webhooksite-axwayid-1.0.0
+  virtualHost: gmdemo-webhooksite-axwayid

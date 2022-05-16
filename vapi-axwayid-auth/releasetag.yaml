@@ -1,0 +1,10 @@
+apiVersion: v1alpha1
+group: management
+kind: ReleaseTag
+name: webhooksite-axwayid
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: webhooksite-axwayid
+spec:
+  releaseType: major

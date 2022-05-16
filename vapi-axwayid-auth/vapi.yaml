@@ -1,0 +1,72 @@
+apiVersion: v1alpha1
+group: management
+kind: VirtualAPI
+name: webhooksite-axwayid
+spec:
+  type: REST
+---
+group: management
+apiVersion: v1alpha1
+kind: AmplifyJWTAuthRule
+name: axwayid
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: webhooksite-axwayid
+spec:
+  description: Use AxwayId to authorize access.
+  jwks:
+    uri: https://login.axway.com/auth/realms/Broker/protocol/openid-connect/certs
+  clientIdKey: azp
+  issuer: https://login.axway.com/auth/realms/Broker
+---
+apiVersion: v1alpha1
+group: management
+kind: ExternalSecret
+name: webhooksite-axwayid
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: webhooksite-axwayid
+tags:
+  - v1
+spec:
+  config:
+    provider: Kubernetes
+    name: webhooksite-axwayid-secret
+    namespace: ampgw
+  data:
+    kind: APIKey
+    alias: key
+---
+group: management
+apiVersion: v1alpha1
+kind: VirtualService
+name: webhooksite-axwayid
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: webhooksite-axwayid
+spec:
+  prefix: /hook
+  auth:
+    kind: AmplifyJWTAuthRule
+    name: axwayid
+  route:
+    - service:
+        prefix: /49f4b608-823e-46be-ad5f-fd3feb593ec9
+        protocol: https
+        codec: AUTO
+        credentials:
+          - kind: APIKeyCredential
+            secretName: webhooksite-axwayid
+            in:
+              name: x-gm-key
+              location: header
+        endpoints:
+          - host: webhook.site
+            port: 443
+      operations:
+        - id: getDemo
+          path: /demo
+          method: GET

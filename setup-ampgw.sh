@@ -21,10 +21,10 @@ ACC=$(axway --env $PLATFORM_ENV service-account create --name $ENVIRONMENT --pub
 CLIENT_ID=$(echo $ACC | jq -r .client.client_id)
 ORG_ID=$(echo $ACC | jq -r .org.id)
 
-#echo ==============================
-#echo === Creating Listener Cert ===
-#echo ==============================
-#openssl req -x509 -newkey rsa:4096 -keyout $ENVIRONMENT-listener-private-key.pem -nodes -out $ENVIRONMENT-listener-certificate.pem -days 365 -subj '/CN=*.ampgw.com/O=Axway/C=IE'
+echo ==============================
+echo === Creating Listener Cert ===
+echo ==============================
+openssl req -x509 -newkey rsa:4096 -keyout $ENVIRONMENT-listener-private-key.pem -nodes -out $ENVIRONMENT-listener-certificate.pem -days 365 -subj '/CN=*.ampgw.com/O=Axway/C=IE'
 
 echo =============================
 echo === Creating AmpGw Secret ===
@@ -101,6 +101,12 @@ provisioning:
   centralUrl: $CENTRAL_URL
 
 ampgw-proxy:
+  image:
+    repository: envoyproxy/envoy-distroless
+    tag: v1.21-latest
+    pullPolicy: Always
+
+
   imagePullSecrets:
     - name: regcred
 EOF

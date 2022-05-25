@@ -117,7 +117,7 @@ spec:
     clientId: $CLIENT_ID
 EOF
 
-axway --env $PLATFORM_ENV central apply -f ./acessrequest.yaml
+axway --env $PLATFORM_ENV central apply -f ./accessrequest.yaml
 
 echo =========
 echo = Test  =

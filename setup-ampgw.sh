@@ -7,7 +7,7 @@ echo ================================
 echo === Create Namespace ${AMGPW_NAMESPACE:-default}
 echo ================================
 if [ ! -z "${AMGPW_NAMESPACE}" ]; then
-  kubectl create namespace ${AMGPW_NAMESPACE}
+  oc create namespace ${AMGPW_NAMESPACE}
 fi
 
 echo ================================
@@ -29,8 +29,8 @@ openssl req -x509 -newkey rsa:4096 -keyout $ENVIRONMENT-listener-private-key.pem
 echo =============================
 echo === Creating AmpGw Secret ===
 echo =============================
-kubectl delete secret ampgw-secret -n ${AMGPW_NAMESPACE:-default}
-kubectl create secret generic ampgw-secret \
+oc delete secret ampgw-secret -n ${AMGPW_NAMESPACE:-default}
+oc create secret generic ampgw-secret \
     -n ${AMGPW_NAMESPACE:-default} \
     --from-file serviceAccPrivateKey=private_key.pem \
     --from-file serviceAccPublicKey=public_key.pem \
@@ -117,9 +117,9 @@ helm install ampgw ampc-rel/ampgw -f override.yaml -n ${AMGPW_NAMESPACE:-default
 echo ============================
 echo === Waiting for all Pods ===
 echo ============================
-kubectl -n ${AMGPW_NAMESPACE:-default} wait --timeout 10m --for=condition=Complete jobs --all
+oc -n ${AMGPW_NAMESPACE:-default} wait --timeout 10m --for=condition=Complete jobs --all
 
 echo ============================
 echo === Add Service Monitor  ===
 echo ============================
-kubectl apply -f prometheus/envoy-servicemonitor.yaml
+oc apply -f prometheus/envoy-servicemonitor.yaml

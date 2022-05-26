@@ -1,7 +1,7 @@
 #!/bin/sh
 
-export ENVIRONMENT=gmdemo
-export ENVIRONMENT_TITLE="GM Demo"
+export ENVIRONMENT=ocdemo
+export ENVIRONMENT_TITLE="Minishift Env"
 
 export PLATFORM_ENV=staging
 export CENTRAL_AUTH_URL=https://login.axwaytest.net/auth

@@ -1,0 +1,32 @@
+apiVersion: v1alpha1
+group: management
+kind: ExternalSecret
+name: webhooksite-auth-cred
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: webhooksite-auth
+tags:
+  - webhooksite
+  - apikey
+spec:
+  config:
+    provider: Kubernetes
+    name: webhooksite-secret
+    namespace: ampgw
+  data:
+    kind: APIKey
+    alias: apikey
+---
+group: management
+apiVersion: v1alpha1
+kind: APIKeyAuthRule
+name: webhooksite-auth
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: webhooksite-auth
+spec:
+  in: header
+  name: x-apikey
+  description: Authenticated apis.

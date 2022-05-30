@@ -1,0 +1,31 @@
+group: management
+apiVersion: v1alpha1
+kind: VirtualService
+name: webhooksite-auth
+metadata:
+  scope:
+    kind: VirtualAPI
+    name: webhooksite-auth
+spec:
+  prefix: /hook
+  auth:
+    kind: APIKeyAuthRule
+    name: webhooksite-auth
+  route:
+    - service:
+        prefix: /8c294cc1-cb08-4839-8841-e8beb1f674e6
+        protocol: https
+        codec: AUTO
+        credentials:
+          - kind: APIKeyCredential
+            secretName: webhooksite-auth-cred 
+            in:
+              name: api-key
+              location: header
+        endpoints:
+          - host: webhook.site
+            port: 443
+      operations:
+        - id: getDemo
+          path: /demo
+          method: GET

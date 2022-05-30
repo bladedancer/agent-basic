@@ -1,0 +1,50 @@
+apiVersion: v1alpha1
+group: management
+kind: VirtualAPI
+name: webhooksite-auth
+spec:
+  type: REST
+  api:
+    oas: {
+      "openapi": "3.0.1",
+      "info": {
+        "version": "1.0.0",
+        "title": "WebhookSite Demo",
+        "description": "Demo spec."
+      },
+      "servers": [
+        {
+          "url": "https://webhook.site/8c294cc1-cb08-4839-8841-e8beb1f674e6"
+        }
+      ],
+      "paths": {
+        "/demo": {
+          "get": {
+            "summary": "Header parameter",
+            "description": "`apiKey` auth will be supplied within an `API-KEY` header parameter.",
+            "tags": ["API Key"],
+            "responses": {
+              "200": {
+                "description": "OK"
+              }
+            },
+            "security": [
+              {
+                "apiKey_header": []
+              }
+            ]
+          }
+        }
+      },
+      "components": {
+        "securitySchemes": {
+          "apiKey_header": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "API-KEY",
+            "description": "An API key that will be supplied in a named header. https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#security-scheme-object"
+          }
+        }
+      }
+    }
+      

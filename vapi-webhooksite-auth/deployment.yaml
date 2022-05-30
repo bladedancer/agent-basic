@@ -1,0 +1,49 @@
+apiVersion: v1alpha1
+group: management
+kind: ExternalSecret
+name: gmdemo-webhooksite-auth
+metadata:
+  scope:
+    kind: Environment
+    name: gmdemo
+tags:
+  - v1
+spec:
+  config:
+    provider: Kubernetes
+    name: ampgw-secret
+    namespace: ampgw
+  data:
+    kind: TLS
+    privateKeyAlias: listenerPrivateKey
+    certificateAlias: listenerCertificate
+---
+apiVersion: v1alpha1
+group: management
+kind: VirtualHost
+name: gmdemo-webhooksite-auth
+metadata:
+  scope:
+    kind: Environment
+    name: gmdemo
+tags:
+  - v1
+spec:
+  domain: "webhooksite-auth.gmdemo.sandbox.ampc.axwaytest.net"
+  secret:
+    kind: ExternalSecret
+    name: gmdemo-webhooksite-auth
+---
+apiVersion: v1alpha1
+group: management
+kind: Deployment
+name: webhooksite-auth
+metadata:
+  scope:
+    kind: Environment
+    name: gmdemo
+tags:
+  - v1
+spec:
+  virtualAPIRelease: webhooksite-auth-1.0.0
+  virtualHost: gmdemo-webhooksite-auth

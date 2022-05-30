@@ -1,11 +1,11 @@
 apiVersion: v1alpha1
 group: management
 kind: ExternalSecret
-name: gmdemo-webhooksite
+name: ocdemo-webhooksite
 metadata:
   scope:
     kind: Environment
-    name: gmdemo
+    name: ocdemo
 tags:
   - v1
 spec:
@@ -21,18 +21,18 @@ spec:
 apiVersion: v1alpha1
 group: management
 kind: VirtualHost
-name: gmdemo-webhooksite
+name: ocdemo-webhooksite
 metadata:
   scope:
     kind: Environment
-    name: gmdemo
+    name: ocdemo
 tags:
   - v1
 spec:
-  domain: "webhooksite.gmdemo.sandbox.ampc.axwaytest.net"
+  domain: "webhooksite.ocdemo.sandbox.ampc.axwaytest.net"
   secret:
     kind: ExternalSecret
-    name: gmdemo-webhooksite
+    name: ocdemo-webhooksite
 ---
 apiVersion: v1alpha1
 group: management
@@ -41,9 +41,9 @@ name: webhooksite
 metadata:
   scope:
     kind: Environment
-    name: gmdemo
+    name: ocdemo
 tags:
   - v1
 spec:
   virtualAPIRelease: webhooksite-1.0.0
-  virtualHost: gmdemo-webhooksite
+  virtualHost: ocdemo-webhooksite

@@ -9,9 +9,9 @@ cd $ROOTDIR
 
 
 axway --env $PLATFORM_ENV central delete deployment webhooksite -s $ENVIRONMENT -y
-sleep 10
+sleep 20
 axway --env $PLATFORM_ENV central delete virtualapi webhooksite -y
-sleep 10
+sleep 20
 
 axway --env $PLATFORM_ENV central apply -f ./vapi.yaml
 axway --env $PLATFORM_ENV central apply -f ./releasetag.yaml

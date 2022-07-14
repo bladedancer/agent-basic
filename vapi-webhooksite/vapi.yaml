@@ -19,7 +19,7 @@ spec:
     kind: PassthroughAuthRule
   route:
     - service:
-        prefix: /24998d10-01d0-459a-a1b8-8d0612ddd895
+        prefix: /9f2a136f-7b31-4bae-af5b-14f22448f7e7
         protocol: https
         codec: AUTO
         endpoints:

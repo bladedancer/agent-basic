@@ -47,11 +47,6 @@ axway --env $PLATFORM_ENV central delete env $ENVIRONMENT -y
 echo ============================
 echo === Installing Dataplane ===
 echo ============================
-CREDS=$(cat ~/.docker/config.json | jq -r '.auths."axway.jfrog.io".auth' | base64 -d)
-IFS=':'
-read -a userpass <<< "$CREDS"
-helm repo add --force-update ampc-rel https://axway.jfrog.io/artifactory/ampc-helm-release --username ${userpass[0]} --password ${userpass[1]}
-
 cat << EOF > override.yaml
 global:
   environment: $ENVIRONMENT
@@ -61,14 +56,7 @@ global:
   proxyAdminPort: 9901
   tlsExternalSecretName: ampgw-secret
 
-imagePullSecrets:
-  - name: regcred
-ampgw-secret-provider-k8s:
-  imagePullSecrets:
-  - name: regcred
 ampgw-traceability-agent:
-  imagePullSecrets:
-  - name: regcred
   env:
     CENTRAL_AUTH_URL: $CENTRAL_AUTH_URL
     CENTRAL_URL: $CENTRAL_URL
@@ -83,8 +71,6 @@ ampgw-traceability-agent:
     TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW: "$TRACEABILITY_REDACTION_RESPONSEHEADER_SHOW"
 
 ampgw-governance-agent:
-  imagePullSecrets: 
-    - name: regcred
   readinessProbe:
     timeoutSeconds: 5
   livenessProbe:
@@ -105,21 +91,13 @@ ampgw-proxy:
     repository: envoyproxy/envoy-distroless
     tag: v1.21-latest
     pullPolicy: Always
-
-
-  imagePullSecrets:
-    - name: regcred
 EOF
 
 helm delete ampgw -n ${AMGPW_NAMESPACE:-default} --wait
-helm install ampgw ampc-rel/ampgw -f override.yaml -n ${AMGPW_NAMESPACE:-default} --wait
+helm install ampgw axway-repo/amplifygateway-helm-prod-ampgw -f override.yaml -n ${AMGPW_NAMESPACE:-default} --wait
 
 echo ============================
 echo === Waiting for all Pods ===
 echo ============================
 kubectl -n ${AMGPW_NAMESPACE:-default} wait --timeout 10m --for=condition=Complete jobs --all
 
-echo ============================
-echo === Add Service Monitor  ===
-echo ============================
-kubectl apply -f prometheus/envoy-servicemonitor.yaml

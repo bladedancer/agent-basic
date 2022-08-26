@@ -1,11 +1,11 @@
 apiVersion: v1alpha1
 group: management
 kind: ExternalSecret
-name: resource-vapi-jsonplaceholder
+name: gmdemo-jsonplaceholder
 metadata:
   scope:
     kind: Environment
-    name: resource-vapi
+    name: gmdemo
 tags:
   - v1
 spec:
@@ -21,18 +21,18 @@ spec:
 apiVersion: v1alpha1
 group: management
 kind: VirtualHost
-name: resource-vapi-jsonplaceholder
+name: gmdemo-jsonplaceholder
 metadata:
   scope:
     kind: Environment
-    name: resource-vapi
+    name: gmdemo
 tags:
   - v1
 spec:
-  domain: "jsonplaceholder.resource-vapi.sandbox.ampc.axwaytest.net"
+  domain: "jsonplaceholder.gmdemo.sandbox.ampc.axwaytest.net"
   secret:
     kind: ExternalSecret
-    name: resource-vapi-jsonplaceholder
+    name: gmdemo-jsonplaceholder
 ---
 apiVersion: v1alpha1
 group: management
@@ -41,9 +41,9 @@ name: jsonplaceholder
 metadata:
   scope:
     kind: Environment
-    name: resource-vapi
+    name: gmdemo
 tags:
   - v1
 spec:
   virtualAPIRelease: jsonplaceholder-1.0.0
-  virtualHost: resource-vapi-jsonplaceholder
+  virtualHost: gmdemo-jsonplaceholder

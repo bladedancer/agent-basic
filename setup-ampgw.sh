@@ -2,6 +2,7 @@
 
 . ./env.sh
 
+ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo ================================
 echo === Create Namespace ${AMGPW_NAMESPACE:-default}
@@ -87,10 +88,13 @@ provisioning:
   centralUrl: $CENTRAL_URL
 
 ampgw-proxy:
-  image:
-    repository: envoyproxy/envoy-distroless
-    tag: v1.21-latest
-    pullPolicy: Always
+  volumeMounts:
+    - name: host-workdir
+      mountPath: /workdir
+  volumes:
+    - name: host-workdir
+      hostPath:
+        path: $ROOTDIR/workdir 
 EOF
 
 helm delete ampgw -n ${AMGPW_NAMESPACE:-default} --wait

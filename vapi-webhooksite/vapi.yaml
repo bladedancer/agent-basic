@@ -19,9 +19,12 @@ spec:
     kind: PassthroughAuthRule
   route:
     - service:
-        prefix: /9f2a136f-7b31-4bae-af5b-14f22448f7e7
+        prefix: /dc91489e-3c5c-4905-865b-857024700316
         protocol: https
         codec: AUTO
+        serverCertValidation:
+          allowUntrustedCert: true
+          allowExpiredCert: true
         endpoints:
           - host: webhook.site
             port: 443

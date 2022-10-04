@@ -13,7 +13,7 @@ spec:
     name: webhooksite-auth
   route:
     - service:
-        prefix: /9f2a136f-7b31-4bae-af5b-14f22448f7e7
+        prefix: /98f9bed6-198e-4ae6-a704-dc15d39adc1d
         protocol: https
         codec: AUTO
         credentials:
